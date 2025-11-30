@@ -46,7 +46,7 @@
             public IActionResult Update(int idProducto)
             {
                 var producto = _productoRepository.GetProductoById(idProducto);
-                return (producto == null)? View(producto):NotFound();
+                return (producto != null)? View(producto):NotFound();
             }
             [HttpPost]
             public IActionResult Update(int idProducto, Producto producto)

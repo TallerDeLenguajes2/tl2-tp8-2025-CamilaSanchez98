@@ -1,0 +1,30 @@
+@using DistribuidoraInsumosMVC.Models;
+@model List<Presupuesto>
+
+<h2>Presupuesto</h2>
+
+<a asp-controller="Presupuesto" asp-action="Create" class="btn btn-primary">Crear Presupuesto</a>
+
+<table class="table table-striped mt-3">
+    <thead>
+        <tr>
+            <th>Codigo</th>
+            <th>Fecha de creacion</th>
+            <th>Nombre del destinatario</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach(var presupuesto in Model)
+    {
+        <tr>
+            <td>@presupuesto.idPresupuesto</td>
+            <td>@presupuesto.fechaCreacion</td>
+            <td>@presupuesto.nombreDestinatario</td>
+            <td>
+                <a asp-controller="Presupuestos" asp-action="Update" asp-route-id="@presupuesto.idPresupuesto" class="btn btn-warning">Editar</a>
+                <a asp-controller="Presupuestos" asp-action="Delete" asp-route-id="@presupuesto.idPresupuesto" class="btn btn-danger">Eliminar</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
