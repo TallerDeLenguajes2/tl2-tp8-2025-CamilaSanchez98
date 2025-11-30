@@ -117,9 +117,19 @@ namespace DistribuidoraInsumosMVC.Repositories
             return command.ExecuteNonQuery() > 0;
         }
         //agregar ActualizarPresupuesto()
-        public bool ActualizarPresupuesto(int idPresupuesto,Presupuesto presupuestoNuevo)
+        public bool ActualizarPresupuesto(int idPresupuesto,Presupuesto presupuesto)
         {
-            return true;
+            using var connection = new SqliteConnection(cadenaConexion);
+            string query =@"UPDATE Presupuestos
+                            SET NombreDestinatario = @nombre, FechaCreacion = @fecha
+                            WHERE idPresupuestos = @id";
+            using var command = new SqliteCommand(query, connection);
+            command.Parameters.Add(new SqliteParameter("@nombre", presupuesto.nombreDestinatario));
+            command.Parameters.Add(new SqliteParameter("@fecha", presupuesto.fechaCreacion));
+            command.Parameters.Add(new SqliteParameter("@id", presupuesto.idPresupuesto));
+            connection.Open();
+
+            return command.ExecuteNonQuery()>0;
         }
 
         public bool EliminarPresupuesto(int idPresupuesto)

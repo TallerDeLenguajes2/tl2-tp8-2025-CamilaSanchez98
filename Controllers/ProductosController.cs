@@ -8,7 +8,6 @@
         public class ProductosController : Controller
         {
             private ProductoRepository _productoRepository;
-            private readonly ILogger<ProductosController> _logger;
 
             public ProductosController()
             {
