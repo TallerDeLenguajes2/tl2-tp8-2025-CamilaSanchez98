@@ -60,7 +60,7 @@
             public IActionResult Delete(int idProducto)
             {
                 var producto = _productoRepository.GetProductoById(idProducto);
-                return (producto == null)? View(producto):NotFound();
+                return (producto != null)? View(producto):NotFound();
             }
             [HttpPost]
             public IActionResult DeleteConfirmed(int idProducto)
