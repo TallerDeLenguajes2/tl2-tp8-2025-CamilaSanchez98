@@ -1,0 +1,23 @@
+@model Producto
+
+<table class="table table-striped mt-3 caption-top">
+    <caption>DETALLES DEL PRODUCTO # @Model.id</caption>
+    <thead>
+        <tr>
+            <th>Codigo</th>
+            <th>Descripcion</th>
+            <th>Precio</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>@Model.id</td>
+            <td>@Model.descripcion</td>
+            <td>@Model.precio</td>
+            <td>
+                <a asp-controller="Productos" asp-action="Update" asp-route-idProducto="@Model.id" class="btn btn-warning">Editar</a>
+                <a asp-controller="Productos" asp-action="Delete" asp-route-idProducto="@Model.id" class="btn btn-danger">Eliminar</a>
+            </td>
+        </tr>
+</table>

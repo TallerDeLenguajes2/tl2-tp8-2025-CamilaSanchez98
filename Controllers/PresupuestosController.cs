@@ -46,7 +46,7 @@ namespace DistribuidoraInsumosMVC.Controllers
         public IActionResult Update(int idPresupuesto)
         {
             var presupuesto = _presupuestoRepository.GetPresupuestoById(idPresupuesto);
-            return (presupuesto == null)? View(presupuesto):NotFound();
+            return (presupuesto != null)? View(presupuesto):NotFound();
         }
         [HttpPost]
         public IActionResult Update(int idPresupuesto, Presupuesto presupuesto)
@@ -60,7 +60,7 @@ namespace DistribuidoraInsumosMVC.Controllers
         public IActionResult Delete(int idPresupuesto)
         {
             var presupuesto = _presupuestoRepository.GetPresupuestoById(idPresupuesto);
-            return (presupuesto == null)? View(presupuesto):NotFound();
+            return (presupuesto != null)? View(presupuesto):NotFound();
         }
         [HttpPost]
         public IActionResult DeleteConfirmed(int idPresupuesto)

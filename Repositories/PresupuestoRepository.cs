@@ -86,16 +86,40 @@ namespace DistribuidoraInsumosMVC.Repositories
 
             using var reader = command.ExecuteReader(CommandBehavior.SingleRow);
 
+            Presupuesto presupuesto = null;
             if (reader.Read())
             {
-                return new Presupuesto
+                presupuesto = new Presupuesto
                 {
                     idPresupuesto = (reader["idPresupuesto"] != DBNull.Value) ? Convert.ToInt32(reader["idPresupuesto"]) : 0,
                     nombreDestinatario = (reader["NombreDestinatario"] != DBNull.Value) ? reader["NombreDestinatario"].ToString() : string.Empty,
-                    fechaCreacion = (reader["FechaCreacion"] != DBNull.Value) ? Convert.ToDateTime(reader["FechaCreacion"]) : DateTime.MinValue
+                    fechaCreacion = (reader["FechaCreacion"] != DBNull.Value) ? Convert.ToDateTime(reader["FechaCreacion"]) : DateTime.MinValue,
+                    detalle = new List<PresupuestoDetalle>()
                 };
             }
-            return null;
+
+            string queryDetalle = @"SELECT d.idProducto, d.Cantidad FROM PresupuestosDetalle d WHERE d.idPresupuesto = @id";
+
+            using var commandDetalle = new SqliteCommand(queryDetalle, connection);
+            commandDetalle.Parameters.Add(new SqliteParameter("@id", idPresupuesto));
+
+            using var readerDetalle = commandDetalle.ExecuteReader();
+            var productoRepo = new ProductoRepository();
+
+            while (readerDetalle.Read())
+            {
+                var idProducto = Convert.ToInt32(readerDetalle["idProducto"]);
+                var cantidad = Convert.ToInt32(readerDetalle["Cantidad"]);
+                
+                var producto = productoRepo.GetProductoById(idProducto);
+
+                presupuesto.detalle.Add(new PresupuestoDetalle
+                                        {
+                                            producto = producto,
+                                            cantidad = cantidad
+                                        });
+                }
+            return presupuesto;
         }
         public bool AgregarProducto(int idPresupuesto, PresupuestoDetalle detalle)
         {

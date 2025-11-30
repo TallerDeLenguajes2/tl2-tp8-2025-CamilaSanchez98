@@ -1,0 +1,12 @@
+@model Producto
+
+<h2>Eliminar Producto</h2>
+
+<p>¿Seguro que querés eliminar el producto <span class="fw-bold">@Model.descripcion</span>?</p>
+
+<form asp-action="DeleteConfirmed" asp-route-idProducto="@Model.id" method="post">
+    <input type="hidden" asp-for="id" />
+
+    <button class="btn btn-danger">Eliminar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>
