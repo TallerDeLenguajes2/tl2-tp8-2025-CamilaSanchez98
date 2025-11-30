@@ -1,0 +1,44 @@
+# Compilación
+bin/
+obj/
+out/
+
+# Configuración de usuario
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Archivos temporales
+*.tmp
+*.log
+*.cache
+*.db-wal
+*.db-shm
+
+# Archivos generados por VS
+*.pdb
+*.mdb
+
+# Archivos de publicación
+publish/
+wwwroot/dist/
+node_modules/
+
+# Base de datos local (si usás SQLite local)
+Data/*.db
+
+# Configuración sensible o local
+appsettings.Development.json
+appsettings.Local.json
+*.secret.json
+
+# Archivos del sistema operativo
+Thumbs.db
+.DS_Store
+
+# Otros posibles del entorno
+.env
+.idea/
+*.iml
