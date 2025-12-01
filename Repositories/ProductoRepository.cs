@@ -1,10 +1,10 @@
 using DistribuidoraInsumosMVC.Models;
 using Microsoft.Data.Sqlite;
-using System.Data;
+using MVC.Interfaces;
 
 namespace DistribuidoraInsumosMVC.Repositories
 {
-    public class ProductoRepository
+    public class ProductoRepository:IProductoRepository
     {
         private string cadenaConexion = "Data Source = Data/Tienda_final.db";
 
@@ -91,29 +91,6 @@ namespace DistribuidoraInsumosMVC.Repositories
             }
             return null;
         }
-        public Producto GetProductoById2(int idProducto)
-        {
-            using var connection = new SqliteConnection(cadenaConexion);
-            connection.Open();
-
-            string query = "SELECT * FROM Productos WHERE idProducto = @id";
-            using var command = new SqliteCommand(query, connection);
-            command.Parameters.Add(new SqliteParameter("@id", idProducto));
-
-            using var lector = command.ExecuteReader(CommandBehavior.SingleRow); //trae solo 1 fila
-
-            if (lector.Read())
-            {
-                return new Producto
-                {
-                    id = (lector["idProducto"] != DBNull.Value) ? Convert.ToInt32(lector["idProducto"]) : 0,
-                    descripcion = (lector["descripcion"] != DBNull.Value) ? lector["descripcion"].ToString() : string.Empty,
-                    precio = (lector["precio"] != DBNull.Value) ? Convert.ToInt32(lector["precio"]) : 0
-                };
-            }
-            return null;
-        }
-        //el gestor se encarga por medio del CASCADE de eliminar los que usan idProd como FK
         public bool EliminarProducto(int idProducto)
         {
             using var connection = new SqliteConnection(cadenaConexion);
