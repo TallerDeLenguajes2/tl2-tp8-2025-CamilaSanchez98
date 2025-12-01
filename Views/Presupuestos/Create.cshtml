@@ -1,21 +1,22 @@
-@model Producto
+@model Presupuesto
 
-<h2>Crear Producto</h2>
+<h2>Crear Presupuesto</h2>
 
 <form asp-action="Create" method="post">
 
     <div class="form-group">
-        <label asp-for="descripcion"></label>
-        <input asp-for="descripcion" class="form-control" />
-        <span asp-validation-for="descripcion" class="text-danger"></span>
+        <label asp-for="nombreDestinatario"></label>
+        <input asp-for="nombreDestinatario" class="form-control" />
+        <span asp-validation-for="nombreDestinatario" class="text-danger"></span>
     </div>
 
     <div class="form-group">
-        <label asp-for="precio"></label>
-        <input asp-for="precio" class="form-control" />
-        <span asp-validation-for="precio" class="text-danger"></span>
+        <label asp-for="fechaCreacion"></label>
+        <input asp-for="fechaCreacion" type="date" class="form-control" />
+        <span asp-validation-for="fechaCreacion" class="text-danger"></span>
     </div>
 
-    <button type="submit" class="btn btn-success mt-2">Guardar</button>
-
+    <button type="submit" class="btn btn-success mt-3">Guardar</button>
+    <a asp-controller="Presupuestos" asp-action="Index" class="btn btn-secondary mt-3">Cancelar</a>
 </form>
+

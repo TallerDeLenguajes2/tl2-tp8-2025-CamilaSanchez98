@@ -10,10 +10,12 @@ namespace DistribuidoraInsumosMVC.Repositories
 
         public bool CrearPresupuesto(Presupuesto presupuesto)
         {
-            foreach (var detalleActual in presupuesto.detalle)
-            {
-                var encontrado = new ProductoRepository().GetProductoById(detalleActual.producto.id);
-                if (encontrado == null) return false;
+            if(presupuesto.detalle != null){
+                foreach (var detalleActual in presupuesto.detalle)
+                {
+                    var encontrado = new ProductoRepository().GetProductoById(detalleActual.producto.id);
+                    if (encontrado == null) return false;
+                }
             }
             using var connection = new SqliteConnection(cadenaConexion);
             connection.Open();
@@ -32,17 +34,20 @@ namespace DistribuidoraInsumosMVC.Repositories
             int idPresupuestoLast = (int)(long)new SqliteCommand("SELECT last_insert_rowid()", connection).ExecuteScalar();
 
             // Insertar los detalles
-            foreach (var detalle in presupuesto.detalle)
+            if (presupuesto.detalle != null)
             {
-                string queryDetalle = "INSERT INTO PresupuestosDetalle (idPresupuesto, idProducto, Cantidad) VALUES (@idPres, @idProd, @cantidad)";
-                using var commandDetalle = new SqliteCommand(queryDetalle, connection);
-                commandDetalle.Parameters.Add(new SqliteParameter("@idPres", idPresupuestoLast));
-                commandDetalle.Parameters.Add(new SqliteParameter("@idProd", detalle.producto.id));
-                commandDetalle.Parameters.Add(new SqliteParameter("@cantidad", detalle.cantidad));
+                foreach (var detalle in presupuesto.detalle)
+                {
+                    string queryDetalle = "INSERT INTO PresupuestosDetalle (idPresupuesto, idProducto, Cantidad) VALUES (@idPres, @idProd, @cantidad)";
+                    using var commandDetalle = new SqliteCommand(queryDetalle, connection);
+                    commandDetalle.Parameters.Add(new SqliteParameter("@idPres", idPresupuestoLast));
+                    commandDetalle.Parameters.Add(new SqliteParameter("@idProd", detalle.producto.id));
+                    commandDetalle.Parameters.Add(new SqliteParameter("@cantidad", detalle.cantidad));
 
-                int filasDetalle = commandDetalle.ExecuteNonQuery();
-                if (filasDetalle == 0) return false;
-                filasDetalle = 0;
+                    int filasDetalle = commandDetalle.ExecuteNonQuery();
+                    if (filasDetalle == 0) return false;
+                    filasDetalle = 0;
+                }
             }
             return true;
         }
@@ -132,7 +137,7 @@ namespace DistribuidoraInsumosMVC.Repositories
             var presupuesto = new PresupuestoRepository().GetPresupuestoById(idPresupuesto);
             if (presupuesto == null) return false;
 
-            string query = "INSERT INTO PresupuestosDetalle (idProducto,idPresupuesto,Cantidad) VALUES (@idProd,@idPres,@cantidad)"; 
+            string query = @"INSERT INTO PresupuestosDetalle (idPresupuesto,idProducto,Cantidad) VALUES (@idPres,@idProd,@cantidad) ON CONFLICT(idPresupuesto, idProducto) DO UPDATE SET Cantidad = Cantidad + @cantidad;"; 
             
             using var command = new SqliteCommand(query, connection);
             command.Parameters.Add(new SqliteParameter("@idProd",detalle.producto.id));
@@ -140,13 +145,12 @@ namespace DistribuidoraInsumosMVC.Repositories
             command.Parameters.Add(new SqliteParameter("@cantidad",detalle.cantidad));
             return command.ExecuteNonQuery() > 0;
         }
-        //agregar ActualizarPresupuesto()
         public bool ActualizarPresupuesto(int idPresupuesto,Presupuesto presupuesto)
         {
             using var connection = new SqliteConnection(cadenaConexion);
             string query =@"UPDATE Presupuestos
                             SET NombreDestinatario = @nombre, FechaCreacion = @fecha
-                            WHERE idPresupuestos = @id";
+                            WHERE idPresupuesto = @id";
             using var command = new SqliteCommand(query, connection);
             command.Parameters.Add(new SqliteParameter("@nombre", presupuesto.nombreDestinatario));
             command.Parameters.Add(new SqliteParameter("@fecha", presupuesto.fechaCreacion));

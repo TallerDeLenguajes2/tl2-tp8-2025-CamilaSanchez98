@@ -68,5 +68,28 @@ namespace DistribuidoraInsumosMVC.Controllers
             bool eliminado =_presupuestoRepository.EliminarPresupuesto(idPresupuesto);
             return (!eliminado)? View():RedirectToAction("Index");
         }
+
+        //AGREGAR PRODUCTO A PRESUPUESTON EXISTENTE
+        [HttpGet]
+        public IActionResult AddProduct(int idPresupuesto)
+        {
+            var presupuesto = _presupuestoRepository.GetPresupuestoById(idPresupuesto);
+
+            //para poder darle a la vista tambien la lista de productos
+            ViewBag.Productos = new ProductoRepository().ListarProductos();
+            return (presupuesto != null)? View(presupuesto):NotFound();
+        }
+        [HttpPost]
+        public IActionResult AddProduct(int idPresupuesto,int idProducto, int cantidad)
+        {
+            ProductoRepository _proRep = new ProductoRepository();
+            PresupuestoDetalle detalle = new PresupuestoDetalle
+                                        {
+                                            producto = _proRep.GetProductoById(idProducto),
+                                            cantidad = cantidad
+                                        };
+            bool agregado = _presupuestoRepository.AgregarProducto(idPresupuesto, detalle);
+            return (!agregado)? View(): RedirectToAction("Index");
+        }
     }
 }

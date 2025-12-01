@@ -1,11 +1,11 @@
-@model Producto
+@model Presupuesto
 
-<h2>Eliminar Producto</h2>
+<h2>Eliminar Presupuesto</h2>
 
-<p>¿Seguro que querés eliminar el producto <span class="fw-bold">@Model.descripcion</span>?</p>
+<p>¿Seguro que querés eliminar el presupuesto a cargo de <span class="fw-bold">@Model.nombreDestinatario</span>?</p>
 
-<form asp-action="DeleteConfirmed" asp-route-idProducto="@Model.id" method="post">
-    <input type="hidden" asp-for="id" />
+<form asp-action="DeleteConfirmed" asp-route-idPresupuesto="@Model.idPresupuesto" method="post">
+    <input type="hidden" asp-for="idPresupuesto" />
 
     <button class="btn btn-danger">Eliminar</button>
     <a asp-action="Index" class="btn btn-secondary">Cancelar</a>

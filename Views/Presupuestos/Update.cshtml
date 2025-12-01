@@ -1,21 +1,21 @@
-@model Producto
+@model Presupuesto
 
-<h2>Editar Producto</h2>
+<h2>Editar Presupuesto</h2>
 
-<form asp-action="Update"  asp-route-idProducto="@Model.id" method="post">
+<form asp-action="Update"  asp-route-idPresupuesto="@Model.idPresupuesto" method="post">
 
-    <input type="hidden" asp-for="id" />
+    <input type="hidden" asp-for="idPresupuesto" />
 
     <div class="form-group">
-        <label asp-for="descripcion">Descripcion:</label>
-        <input asp-for="descripcion" class="form-control" />
-        <span asp-validation-for="descripcion" class="text-danger"></span>
+        <label asp-for="nombreDestinatario">Nombre del destinatario:</label>
+        <input asp-for="nombreDestinatario" class="form-control" />
+        <span asp-validation-for="nombreDestinatario" class="text-danger"></span>
     </div>
 
     <div class="form-group">
-        <label asp-for="precio">Precio: $</label>
-        <input asp-for="precio" class="form-control" />
-        <span asp-validation-for="precio" class="text-danger"></span>
+        <label asp-for="fechaCreacion">Fecha de Creacion:</label>
+        <input asp-for="fechaCreacion" class="form-control" />
+        <span asp-validation-for="fechaCreacion" class="text-danger"></span>
     </div>
 
     <button type="submit" class="btn btn-primary mt-2">Guardar Cambios</button>
