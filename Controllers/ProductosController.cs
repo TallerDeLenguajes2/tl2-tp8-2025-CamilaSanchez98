@@ -8,10 +8,10 @@ namespace DistribuidoraInsumosMVC.Controllers
 {
     public class ProductosController : Controller
     {
-        private readonly ProductoRepository _productoRepository;
+        private readonly IProductoRepository _productoRepository;
         private readonly IAuthenticationService _authService;
 
-        public ProductosController(ProductoRepository prodRepo, IAuthenticationService authService)
+        public ProductosController(IProductoRepository prodRepo, IAuthenticationService authService)
         {
             _productoRepository = prodRepo;
             _authService = authService;

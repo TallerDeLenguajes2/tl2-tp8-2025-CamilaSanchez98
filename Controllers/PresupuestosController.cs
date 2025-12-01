@@ -9,11 +9,11 @@ namespace DistribuidoraInsumosMVC.Controllers
 {
     public class PresupuestosController : Controller
     {
-        private readonly PresupuestoRepository _presupuestoRepository;
-        private readonly ProductoRepository _prodRepo;
+        private readonly IPresupuestoRepository _presupuestoRepository;
+        private readonly IProductoRepository _prodRepo;
         private readonly IAuthenticationService _authService;
 
-        public PresupuestosController(PresupuestoRepository presRepo, ProductoRepository prodRepo, IAuthenticationService authService)
+        public PresupuestosController(IPresupuestoRepository presRepo, IProductoRepository prodRepo, IAuthenticationService authService)
         {
             _presupuestoRepository = presRepo;
             _prodRepo = prodRepo;

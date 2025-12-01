@@ -15,7 +15,6 @@ namespace DistribuidoraInsumosMVC.Controllers
         // [HttpGet] Muestra la vista de login
         public IActionResult Index()
         {
-            // ... (Crear LoginViewModel)
             return View(new LoginViewModel());
         }
         // [HttpPost] Procesa el login
@@ -35,6 +34,8 @@ namespace DistribuidoraInsumosMVC.Controllers
             model.ErrorMessage = "Credenciales inválidas.";
             return View("Index", model);
         }
+        
+        
         // [HttpGet] Cierra sesión
         public IActionResult Logout()
         {

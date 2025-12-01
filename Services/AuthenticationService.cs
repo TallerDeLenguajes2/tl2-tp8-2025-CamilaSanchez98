@@ -25,8 +25,9 @@ namespace DistribuidoraInsumosMVC.Services
                     throw new InvalidOperationException("HttpContext no está disponible.");
                 }
                 context.Session.SetString("IsAuthenticated", "true");
-                context.Session.SetString("User", user.Username);
-                context.Session.SetString("UserNombre", user.Nombre);
+                context.Session.SetString("Username", user.Username);
+                context.Session.SetString("Password", user.Username);
+                context.Session.SetString("Nombre", user.Nombre);
                 context.Session.SetString("Rol", user.Rol);
                 //es el tipo de acceso/rol admin o cliente
                 return true;
