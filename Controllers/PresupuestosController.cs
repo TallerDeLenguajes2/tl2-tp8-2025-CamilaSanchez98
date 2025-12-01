@@ -55,34 +55,34 @@ namespace DistribuidoraInsumosMVC.Controllers
 
         //ACTUALIZACION
         [HttpGet]
-        public IActionResult Update(int idPresupuesto)
+        public IActionResult Update(int id)
         {
-            var presupuesto = _presupuestoRepository.GetPresupuestoById(idPresupuesto);
+            var presupuesto = _presupuestoRepository.GetPresupuestoById(id);
             if (presupuesto == null) return NotFound();
 
             var model = new PresupuestoViewModel
             {
-                IdPresupuesto = idPresupuesto,
+                IdPresupuesto = id,
                 NombreDestinatario = presupuesto.nombreDestinatario,
                 FechaCreacion = presupuesto.fechaCreacion
             };
-            return View(model);
+            return View("Update",model);
         }
         [HttpPost]
-        public IActionResult Update(int idPresupuesto, PresupuestoViewModel presupuestoVM)
+        public IActionResult Update(int id, PresupuestoViewModel presupuestoVM)
         {
+            if(id != presupuestoVM.IdPresupuesto) return NotFound();
             if(!ModelState.IsValid) return View(presupuestoVM);
-            if(idPresupuesto != presupuestoVM.IdPresupuesto) return NotFound();
 
-                var objeto = new Presupuesto
-                {
-                    idPresupuesto = idPresupuesto,
-                    nombreDestinatario = presupuestoVM.NombreDestinatario,
-                    fechaCreacion = presupuestoVM.FechaCreacion
-                };
+            var objeto = new Presupuesto
+            {
+                idPresupuesto = id,
+                nombreDestinatario = presupuestoVM.NombreDestinatario,
+                fechaCreacion = presupuestoVM.FechaCreacion
+            };
             
-            bool actualizado = _presupuestoRepository.ActualizarPresupuesto(idPresupuesto, objeto);
-            return (!actualizado)? View(objeto): RedirectToAction(nameof(Index));
+            bool actualizado = _presupuestoRepository.ActualizarPresupuesto(id, objeto);
+            return (!actualizado)? View(presupuestoVM): RedirectToAction(nameof(Index));
         }
 
         //ELIMINACION
@@ -95,38 +95,38 @@ namespace DistribuidoraInsumosMVC.Controllers
         [HttpPost]
         public IActionResult DeleteConfirmed(int idPresupuesto)
         {
-            bool eliminado =_presupuestoRepository.EliminarPresupuesto(idPresupuesto);
-            return (!eliminado)? View():RedirectToAction(nameof(Index));
+            _presupuestoRepository.EliminarPresupuesto(idPresupuesto); //podria manejar el bool qque devuleve..
+            return RedirectToAction(nameof(Index));
         }
 
-        //AGREGAR PRODUCTO A PRESUPUESTON EXISTENTE
         [HttpGet]
         public IActionResult AddProduct(int idPresupuesto)
         {
             var pres = _presupuestoRepository.GetPresupuestoById(idPresupuesto);
             if (pres == null) return NotFound();
 
+            var productos = _prodRepo.ListarProductos() ?? new List<Producto>();
+
             var vm = new AgregarProductoViewModel
             {
                 IdPresupuesto = idPresupuesto,
-                ListaProductos = new SelectList(_prodRepo.ListarProductos(), "IdProducto", "Descripcion")
+                ListaProductos = new SelectList(productos, "id", "descripcion")
             };
 
             return View(vm);
         }
-
         [HttpPost]
         public IActionResult AddProduct(AgregarProductoViewModel vm)
         {
             if (!ModelState.IsValid)
             {
-                vm.ListaProductos =
-                    new SelectList(_prodRepo.ListarProductos(), "id", "descripcion");
+                var productos = _prodRepo.ListarProductos() ?? new List<Producto>();
+                vm.ListaProductos = new SelectList(productos, "id", "descripcion");
                 return View(vm);
             }
 
             var prod = _prodRepo.GetProductoById(vm.IdProducto);
-            if(prod==null) return NotFound();
+            if (prod == null) return NotFound();
 
             var detalle = new PresupuestoDetalle
             {
@@ -134,10 +134,16 @@ namespace DistribuidoraInsumosMVC.Controllers
                 cantidad = vm.Cantidad
             };
 
-            //revisar si no debo corregir la logia del repositorio
             bool agregado = _presupuestoRepository.AgregarProducto(vm.IdPresupuesto, detalle);
 
-            return (!agregado)? View(vm):RedirectToAction("Details", new { idPresupuesto = vm.IdPresupuesto });
+            if (!agregado)
+            {
+                var productos = _prodRepo.ListarProductos() ?? new List<Producto>();
+                vm.ListaProductos = new SelectList(productos, "id", "descripcion");
+                return View(vm);
+            }
+
+            return RedirectToAction("Details", new { idPresupuesto = vm.IdPresupuesto });
         }
     }
 }

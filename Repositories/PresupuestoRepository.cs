@@ -168,17 +168,19 @@ namespace DistribuidoraInsumosMVC.Repositories
             var presupuesto = new PresupuestoRepository().GetPresupuestoById(idPresupuesto);
             if (presupuesto == null) return false;
 
-            string query0 = "DELETE FROM PresupuestosDetalle WHERE idPresupuesto = @id";
-            using var command0 = new SqliteCommand(query0, connection);
-            command0.Parameters.Add(new SqliteParameter("@id", idPresupuesto));
-
-            if(command0.ExecuteNonQuery() > 0){
-                string query = "DELETE FROM Presupuestos WHERE idPresupuesto = @id";
-                using var command = new SqliteCommand(query, connection);
-                command.Parameters.Add(new SqliteParameter("@id", idPresupuesto));
-                return command.ExecuteNonQuery() > 0;
+            string queryDetalle = "DELETE FROM PresupuestosDetalle WHERE idPresupuesto = @id";
+            using (var cmdDetalle = new SqliteCommand(queryDetalle, connection))
+            {
+                cmdDetalle.Parameters.Add(new SqliteParameter("@id", idPresupuesto));
+                cmdDetalle.ExecuteNonQuery();
             }
-            return command0.ExecuteNonQuery()>0;
+
+            string queryPresupuesto = "DELETE FROM Presupuestos WHERE idPresupuesto = @id";
+            using (var cmdPresupuesto = new SqliteCommand(queryPresupuesto, connection))
+            {
+                cmdPresupuesto.Parameters.Add(new SqliteParameter("@id", idPresupuesto));
+                return cmdPresupuesto.ExecuteNonQuery() > 0; // true si se borró
+            }
         }
     }
 }
