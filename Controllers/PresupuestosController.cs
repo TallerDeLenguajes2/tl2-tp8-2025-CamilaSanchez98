@@ -1,6 +1,8 @@
 using DistribuidoraInsumosMVC.Repositories;
 using DistribuidoraInsumosMVC.Models;
+using DistribuidoraInsumosMVC.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering; //para el SelectList
 
 namespace DistribuidoraInsumosMVC.Controllers
 {  
@@ -8,10 +10,12 @@ namespace DistribuidoraInsumosMVC.Controllers
     public class PresupuestosController : Controller
     {
         private PresupuestoRepository _presupuestoRepository;
+        private ProductoRepository _prodRepo;
 
         public PresupuestosController()
         {
             _presupuestoRepository = new PresupuestoRepository();
+            _prodRepo = new ProductoRepository();
         }
 
         //LISTADOS Y DETALLES
@@ -32,13 +36,21 @@ namespace DistribuidoraInsumosMVC.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            return View();
+            return View(new PresupuestoViewModel());
         }
         [HttpPost]
-        public IActionResult Create(Presupuesto presupuesto)
+        public IActionResult Create(PresupuestoViewModel presupuestoVM)
         {
-            bool creado = _presupuestoRepository.CrearPresupuesto(presupuesto);
-            return (!creado)? View(presupuesto): RedirectToAction("Index");
+            if (!ModelState.IsValid) return View(presupuestoVM);
+
+            var nuevoPresupuesto = new Presupuesto
+            {
+                nombreDestinatario = presupuestoVM.NombreDestinatario,
+                fechaCreacion = presupuestoVM.FechaCreacion
+            };
+
+            bool creado = _presupuestoRepository.CrearPresupuesto(nuevoPresupuesto);
+            return (!creado)? View(nuevoPresupuesto): RedirectToAction(nameof(Index));
         }
 
         //ACTUALIZACION
@@ -46,13 +58,31 @@ namespace DistribuidoraInsumosMVC.Controllers
         public IActionResult Update(int idPresupuesto)
         {
             var presupuesto = _presupuestoRepository.GetPresupuestoById(idPresupuesto);
-            return (presupuesto != null)? View(presupuesto):NotFound();
+            if (presupuesto == null) return NotFound();
+
+            var model = new PresupuestoViewModel
+            {
+                IdPresupuesto = idPresupuesto,
+                NombreDestinatario = presupuesto.nombreDestinatario,
+                FechaCreacion = presupuesto.fechaCreacion
+            };
+            return View(model);
         }
         [HttpPost]
-        public IActionResult Update(int idPresupuesto, Presupuesto presupuesto)
+        public IActionResult Update(int idPresupuesto, PresupuestoViewModel presupuestoVM)
         {
-            bool actualizado = _presupuestoRepository.ActualizarPresupuesto(idPresupuesto, presupuesto);
-            return (!actualizado)? View(presupuesto): RedirectToAction("Index");
+            if(!ModelState.IsValid) return View(presupuestoVM);
+            if(idPresupuesto != presupuestoVM.IdPresupuesto) return NotFound();
+
+                var objeto = new Presupuesto
+                {
+                    idPresupuesto = idPresupuesto,
+                    nombreDestinatario = presupuestoVM.NombreDestinatario,
+                    fechaCreacion = presupuestoVM.FechaCreacion
+                };
+            
+            bool actualizado = _presupuestoRepository.ActualizarPresupuesto(idPresupuesto, objeto);
+            return (!actualizado)? View(objeto): RedirectToAction(nameof(Index));
         }
 
         //ELIMINACION
@@ -66,30 +96,48 @@ namespace DistribuidoraInsumosMVC.Controllers
         public IActionResult DeleteConfirmed(int idPresupuesto)
         {
             bool eliminado =_presupuestoRepository.EliminarPresupuesto(idPresupuesto);
-            return (!eliminado)? View():RedirectToAction("Index");
+            return (!eliminado)? View():RedirectToAction(nameof(Index));
         }
 
         //AGREGAR PRODUCTO A PRESUPUESTON EXISTENTE
         [HttpGet]
         public IActionResult AddProduct(int idPresupuesto)
         {
-            var presupuesto = _presupuestoRepository.GetPresupuestoById(idPresupuesto);
+            var pres = _presupuestoRepository.GetPresupuestoById(idPresupuesto);
+            if (pres == null) return NotFound();
 
-            //para poder darle a la vista tambien la lista de productos
-            ViewBag.Productos = new ProductoRepository().ListarProductos();
-            return (presupuesto != null)? View(presupuesto):NotFound();
+            var vm = new AgregarProductoViewModel
+            {
+                IdPresupuesto = idPresupuesto,
+                ListaProductos = new SelectList(_prodRepo.ListarProductos(), "IdProducto", "Descripcion")
+            };
+
+            return View(vm);
         }
+
         [HttpPost]
-        public IActionResult AddProduct(int idPresupuesto,int idProducto, int cantidad)
+        public IActionResult AddProduct(AgregarProductoViewModel vm)
         {
-            ProductoRepository _proRep = new ProductoRepository();
-            PresupuestoDetalle detalle = new PresupuestoDetalle
-                                        {
-                                            producto = _proRep.GetProductoById(idProducto),
-                                            cantidad = cantidad
-                                        };
-            bool agregado = _presupuestoRepository.AgregarProducto(idPresupuesto, detalle);
-            return (!agregado)? View(): RedirectToAction("Index");
+            if (!ModelState.IsValid)
+            {
+                vm.ListaProductos =
+                    new SelectList(_prodRepo.ListarProductos(), "id", "descripcion");
+                return View(vm);
+            }
+
+            var prod = _prodRepo.GetProductoById(vm.IdProducto);
+            if(prod==null) return NotFound();
+
+            var detalle = new PresupuestoDetalle
+            {
+                producto = prod,
+                cantidad = vm.Cantidad
+            };
+
+            //revisar si no debo corregir la logia del repositorio
+            bool agregado = _presupuestoRepository.AgregarProducto(vm.IdPresupuesto, detalle);
+
+            return (!agregado)? View(vm):RedirectToAction("Details", new { idPresupuesto = vm.IdPresupuesto });
         }
     }
 }
