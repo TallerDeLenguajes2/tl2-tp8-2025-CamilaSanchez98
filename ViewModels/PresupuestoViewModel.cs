@@ -12,8 +12,20 @@ namespace DistribuidoraInsumosMVC.ViewModels
         public string NombreDestinatario { get; set; }
 
         [Required(ErrorMessage = "Debe ingresar una fecha de creación.")]
-        //validacion de fecha no futura falta agregar...
+        [FechaValida]
         [DataType(DataType.Date)]
         public DateTime FechaCreacion { get; set; }
+    }
+
+    public class FechaValida: ValidationAttribute
+    {
+        public override bool IsValid(object value)
+        {
+            if (value is DateTime fechaIngresada)
+            {
+                return fechaIngresada <= DateTime.Today;
+            }
+            return false;
+        }
     }
 }

@@ -1,23 +1,30 @@
-@model Producto
+@model DistribuidoraInsumosMVC.ViewModels.ProductoViewModel
+
+@{
+    ViewData["Title"] = "Editar Producto";
+}
 
 <h2>Editar Producto</h2>
 
-<form asp-action="Update"  asp-route-idProducto="@Model.id" method="post">
+<form asp-action="Update"  asp-route-idProducto="@Model.IdProducto" method="post">
 
-    <input type="hidden" asp-for="id" />
+    <input type="hidden" asp-for="IdProducto" />
 
     <div class="form-group">
-        <label asp-for="descripcion">Descripcion:</label>
-        <input asp-for="descripcion" class="form-control" />
-        <span asp-validation-for="descripcion" class="text-danger"></span>
+        <label asp-for="Descripcion"></label>
+        <input asp-for="Descripcion" class="form-control" />
+        <span asp-validation-for="Descripcion" class="text-danger"></span>
     </div>
 
     <div class="form-group">
-        <label asp-for="precio">Precio: $</label>
-        <input asp-for="precio" class="form-control" />
-        <span asp-validation-for="precio" class="text-danger"></span>
+        <label asp-for="Precio"> $</label>
+        <input asp-for="Precio" class="form-control" />
+        <span asp-validation-for="Precio" class="text-danger"></span>
     </div>
 
     <button type="submit" class="btn btn-primary mt-2">Guardar Cambios</button>
 
 </form>
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+}
