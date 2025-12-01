@@ -2,45 +2,65 @@ using DistribuidoraInsumosMVC.Repositories;
 using DistribuidoraInsumosMVC.Models;
 using DistribuidoraInsumosMVC.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering; //para el SelectList
+using Microsoft.AspNetCore.Mvc.Rendering;
+using MVC.Interfaces;
 
 namespace DistribuidoraInsumosMVC.Controllers
-{  
-    
+{
     public class PresupuestosController : Controller
     {
-        private PresupuestoRepository _presupuestoRepository;
-        private ProductoRepository _prodRepo;
+        private readonly PresupuestoRepository _presupuestoRepository;
+        private readonly ProductoRepository _prodRepo;
+        private readonly IAuthenticationService _authService;
 
-        public PresupuestosController()
+        public PresupuestosController(PresupuestoRepository presRepo, ProductoRepository prodRepo, IAuthenticationService authService)
         {
-            _presupuestoRepository = new PresupuestoRepository();
-            _prodRepo = new ProductoRepository();
+            _presupuestoRepository = presRepo;
+            _prodRepo = prodRepo;
+            _authService = authService;
         }
 
-        //LISTADOS Y DETALLES
         [HttpGet]
         public IActionResult Index()
         {
-            List<Presupuesto> presupuestos = _presupuestoRepository.ListarPresupuestos();
+            if (!_authService.IsAuthenticated())
+                return RedirectToAction("Index", "Login");
+
+            if (!_authService.HasAccessLevel("Administrador") && !_authService.HasAccessLevel("Cliente"))
+                return RedirectToAction(nameof(AccesoDenegado));
+
+            var presupuestos = _presupuestoRepository.ListarPresupuestos();
             return View(presupuestos);
         }
+
         [HttpGet]
         public IActionResult Details(int idPresupuesto)
         {
+            if (!_authService.IsAuthenticated())
+                return RedirectToAction("Index", "Login");
+
+            if (!_authService.HasAccessLevel("Administrador") && !_authService.HasAccessLevel("Cliente"))
+                return RedirectToAction(nameof(AccesoDenegado));
+
             var presupuesto = _presupuestoRepository.GetPresupuestoById(idPresupuesto);
             return (presupuesto != null) ? View(presupuesto) : NotFound();
         }
 
-        //CREACION
         [HttpGet]
         public IActionResult Create()
         {
+            var securityCheck = CheckAdminPermissions();
+            if (securityCheck != null) return securityCheck;
+
             return View(new PresupuestoViewModel());
         }
+
         [HttpPost]
         public IActionResult Create(PresupuestoViewModel presupuestoVM)
         {
+            var securityCheck = CheckAdminPermissions();
+            if (securityCheck != null) return securityCheck;
+
             if (!ModelState.IsValid) return View(presupuestoVM);
 
             var nuevoPresupuesto = new Presupuesto
@@ -50,13 +70,15 @@ namespace DistribuidoraInsumosMVC.Controllers
             };
 
             bool creado = _presupuestoRepository.CrearPresupuesto(nuevoPresupuesto);
-            return (!creado)? View(nuevoPresupuesto): RedirectToAction(nameof(Index));
+            return (!creado) ? View(presupuestoVM) : RedirectToAction(nameof(Index));
         }
 
-        //ACTUALIZACION
         [HttpGet]
         public IActionResult Update(int id)
         {
+            var securityCheck = CheckAdminPermissions();
+            if (securityCheck != null) return securityCheck;
+
             var presupuesto = _presupuestoRepository.GetPresupuestoById(id);
             if (presupuesto == null) return NotFound();
 
@@ -66,13 +88,17 @@ namespace DistribuidoraInsumosMVC.Controllers
                 NombreDestinatario = presupuesto.nombreDestinatario,
                 FechaCreacion = presupuesto.fechaCreacion
             };
-            return View("Update",model);
+            return View(model);
         }
+
         [HttpPost]
         public IActionResult Update(int id, PresupuestoViewModel presupuestoVM)
         {
-            if(id != presupuestoVM.IdPresupuesto) return NotFound();
-            if(!ModelState.IsValid) return View(presupuestoVM);
+            var securityCheck = CheckAdminPermissions();
+            if (securityCheck != null) return securityCheck;
+
+            if (id != presupuestoVM.IdPresupuesto) return NotFound();
+            if (!ModelState.IsValid) return View(presupuestoVM);
 
             var objeto = new Presupuesto
             {
@@ -80,33 +106,41 @@ namespace DistribuidoraInsumosMVC.Controllers
                 nombreDestinatario = presupuestoVM.NombreDestinatario,
                 fechaCreacion = presupuestoVM.FechaCreacion
             };
-            
+
             bool actualizado = _presupuestoRepository.ActualizarPresupuesto(id, objeto);
-            return (!actualizado)? View(presupuestoVM): RedirectToAction(nameof(Index));
+            return (!actualizado) ? View(presupuestoVM) : RedirectToAction(nameof(Index));
         }
 
-        //ELIMINACION
         [HttpGet]
         public IActionResult Delete(int idPresupuesto)
         {
+            var securityCheck = CheckAdminPermissions();
+            if (securityCheck != null) return securityCheck;
+
             var presupuesto = _presupuestoRepository.GetPresupuestoById(idPresupuesto);
-            return (presupuesto != null)? View(presupuesto):NotFound();
+            return (presupuesto != null) ? View(presupuesto) : NotFound();
         }
+
         [HttpPost]
         public IActionResult DeleteConfirmed(int idPresupuesto)
         {
-            _presupuestoRepository.EliminarPresupuesto(idPresupuesto); //podria manejar el bool qque devuleve..
+            var securityCheck = CheckAdminPermissions();
+            if (securityCheck != null) return securityCheck;
+
+            _presupuestoRepository.EliminarPresupuesto(idPresupuesto);
             return RedirectToAction(nameof(Index));
         }
 
         [HttpGet]
         public IActionResult AddProduct(int idPresupuesto)
         {
+            var securityCheck = CheckAdminPermissions();
+            if (securityCheck != null) return securityCheck;
+
             var pres = _presupuestoRepository.GetPresupuestoById(idPresupuesto);
             if (pres == null) return NotFound();
 
             var productos = _prodRepo.ListarProductos() ?? new List<Producto>();
-
             var vm = new AgregarProductoViewModel
             {
                 IdPresupuesto = idPresupuesto,
@@ -115,9 +149,13 @@ namespace DistribuidoraInsumosMVC.Controllers
 
             return View(vm);
         }
+
         [HttpPost]
         public IActionResult AddProduct(AgregarProductoViewModel vm)
         {
+            var securityCheck = CheckAdminPermissions();
+            if (securityCheck != null) return securityCheck;
+
             if (!ModelState.IsValid)
             {
                 var productos = _prodRepo.ListarProductos() ?? new List<Producto>();
@@ -144,6 +182,23 @@ namespace DistribuidoraInsumosMVC.Controllers
             }
 
             return RedirectToAction("Details", new { idPresupuesto = vm.IdPresupuesto });
+        }
+
+        [HttpGet]
+        public IActionResult AccesoDenegado()
+        {
+            return View();
+        }
+
+        private IActionResult CheckAdminPermissions()
+        {
+            if (!_authService.IsAuthenticated())
+                return RedirectToAction("Index", "Login");
+
+            if (!_authService.HasAccessLevel("Administrador"))
+                return RedirectToAction(nameof(AccesoDenegado));
+
+            return null;
         }
     }
 }

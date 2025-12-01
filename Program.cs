@@ -5,7 +5,7 @@ using DistribuidoraInsumosMVC.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Servicios de Sesión y Acceso a Contexto (CLAVE para la autenticación)
+// ----- Servicios de Sesión -----
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSession(options =>
 {
@@ -13,22 +13,29 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
-// Registro de la Inyección de Dependencia (TODOS AddScoped)
+
+// ----- Inyección de Dependencias -----
 builder.Services.AddScoped<IProductoRepository, ProductoRepository>();
 builder.Services.AddScoped<IPresupuestoRepository, PresupuestoRepository>();
 builder.Services.AddScoped<IUserRepository, UsuarioRepository>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
-// Configuración del Pipeline de Middleware
-// El orden es CRUCIAL: UseSession debe ir ANTES de UseRouting/UseAuthorization
-app.UseSession(); // → Habilita el uso de la sesión
+
+// ----- Middleware -----
+app.UseSession(); // ponerlo antes de UseRouting
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
 app.UseRouting();
-app.UseAuthorization(); // Necesario si usa atributos, aunque aquí lo haremos manual
+
+app.UseAuthorization(); // lo necesito si uso atributos, en este tp es manual
+
+// ----- Rutas -----
 app.MapControllerRoute(
- name: "default",
- pattern: "{controller=Home}/{action=Index}/{id?}");
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
 app.Run();
