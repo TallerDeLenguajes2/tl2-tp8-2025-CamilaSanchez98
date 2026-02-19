@@ -18,6 +18,6 @@ namespace DistribuidoraInsumosMVC.ViewModels
         public int Cantidad { get; set; }
 
         // Lista para el dropdown del formulario
-        public SelectList ListaProductos { get; set; }
+        public SelectList ListarCategorias { get; set; }
     }
 }
