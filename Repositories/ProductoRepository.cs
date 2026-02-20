@@ -7,12 +7,19 @@ namespace DistribuidoraInsumosMVC.Repositories
 {
     public class ProductoRepository : IProductoRepository
     {
-        private string cadenaConexion = "Data Source = Data/Tienda_final.db";
+        // private string cadenaConexion = "Data Source = Data/Tienda_final.db";
+        private readonly string _ConnectionString;
+
+        public ProductoRepository(string ConnectionString)
+        {
+            _ConnectionString = ConnectionString;
+        }
+        public ProductoRepository(){}
 
         public bool CrearProducto(Producto producto) //recibe un objeto Producto
         {
 
-            using var connection = new SqliteConnection(cadenaConexion);
+            using var connection = new SqliteConnection(_ConnectionString);
             connection.Open();
 
             string query = "INSERT INTO Productos (descripcion,precio) VALUES (@descripcion,@precio)"; //id AI
@@ -26,7 +33,7 @@ namespace DistribuidoraInsumosMVC.Repositories
 
         public bool ActualziarProducto(int idProducto, Producto productoModificado) //recibe id y objeto producto
         {
-            using var connection = new SqliteConnection(cadenaConexion);
+            using var connection = new SqliteConnection(_ConnectionString);
             connection.Open();
 
             string query = "UPDATE Productos SET descripcion = @descripcion, precio = @precio WHERE idProducto = @id";
@@ -39,7 +46,7 @@ namespace DistribuidoraInsumosMVC.Repositories
 
         public List<Producto> ListarProductos() //devuelve un lsit de productos REGISTRADOS
         {
-            using var connection = new SqliteConnection(cadenaConexion);
+            using var connection = new SqliteConnection(_ConnectionString);
             connection.Open();
 
             string query = "SELECT * FROM Productos";
@@ -72,11 +79,11 @@ namespace DistribuidoraInsumosMVC.Repositories
 
         public Producto GetProductoById(int idProducto) // recibe ID devuelve producto
         {
-            using var connection = new SqliteConnection(cadenaConexion);
+            using var connection = new SqliteConnection(_ConnectionString);
             connection.Open();
 
             string query = "SELECT * FROM Productos WHERE idProducto = @id";
-            using var command = new SqliteCommand(query, connection); //using para eivtar que queden referencias activas 
+            using var command = new SqliteCommand(query, connection); //using para eivtar que queden referencias activas
             command.Parameters.Add(new SqliteParameter("@id", idProducto));
             using SqliteDataReader reader = command.ExecuteReader();
 
@@ -94,7 +101,7 @@ namespace DistribuidoraInsumosMVC.Repositories
         }
         public Producto GetProductoById2(int idProducto)
         {
-            using var connection = new SqliteConnection(cadenaConexion);
+            using var connection = new SqliteConnection(_ConnectionString);
             connection.Open();
 
             string query = "SELECT * FROM Productos WHERE idProducto = @id";
@@ -117,7 +124,7 @@ namespace DistribuidoraInsumosMVC.Repositories
         //el gestor se encarga por medio del CASCADE de eliminar los que usan idProd como FK
         public bool EliminarProducto(int idProducto)
         {
-            using var connection = new SqliteConnection(cadenaConexion);
+            using var connection = new SqliteConnection(_ConnectionString);
             connection.Open();
 
             string query = "DELETE FROM Productos WHERE idProducto = @id";

@@ -4,6 +4,8 @@ using DistribuidoraInsumosMVC.Services;
 using DistribuidoraInsumosMVC.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
+var ConnectionString = builder.Configuration.GetConnectionString("SqliteConexion")!.ToString();
+builder.Services.AddSingleton<string>(ConnectionString);
 
 // ----- Servicios de Sesión -----
 builder.Services.AddHttpContextAccessor();
