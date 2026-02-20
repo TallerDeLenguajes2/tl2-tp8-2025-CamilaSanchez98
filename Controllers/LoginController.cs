@@ -4,7 +4,6 @@ using DistribuidoraInsumosMVC.Interfaces;
 
 namespace DistribuidoraInsumosMVC.Controllers
 {
-
     public class LoginController : Controller
     {
         private readonly IAuthenticationService _authenticationService;
@@ -13,9 +12,9 @@ namespace DistribuidoraInsumosMVC.Controllers
             _authenticationService = authenticationService;
         }
         // [HttpGet] Muestra la vista de login
-        [HttpGet]
         public IActionResult Index()
         {
+            if (_authenticationService.IsAuthenticated()) return RedirectToAction("Index","Home");
             return View(new LoginViewModel());
         }
         // [HttpPost] Procesa el login
@@ -25,11 +24,11 @@ namespace DistribuidoraInsumosMVC.Controllers
             if (string.IsNullOrEmpty(model.Username) || string.IsNullOrEmpty(model.Password))
             {
                 model.ErrorMessage = "Debe ingresar usuario y contraseñaaa.";
-                return View("Index", model);
+                return View("Index",model);
             }
             if (_authenticationService.Login(model.Username, model.Password))
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index","Home");
             }
 
             model.ErrorMessage = "Credenciales inválidass.";
@@ -37,11 +36,10 @@ namespace DistribuidoraInsumosMVC.Controllers
         }
 
         // [HttpGet] Cierra sesión
-        [HttpGet]
         public IActionResult Logout()
         {
             _authenticationService.Logout();
-            return RedirectToAction("Index");
+            return RedirectToAction("Index","Home");
         }
     }
 
