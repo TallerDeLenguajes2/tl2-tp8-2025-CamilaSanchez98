@@ -3,8 +3,7 @@ using DistribuidoraInsumosMVC.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DistribuidoraInsumosMVC.Controllers
-{  
-    
+{
     public class PresupuestosController : Controller
     {
         private PresupuestoRepository _presupuestoRepository;
@@ -89,7 +88,17 @@ namespace DistribuidoraInsumosMVC.Controllers
                                             cantidad = cantidad
                                         };
             bool agregado = _presupuestoRepository.AgregarProducto(idPresupuesto, detalle);
-            return (!agregado)? View(): RedirectToAction("Index");
+
+            if (!agregado)
+            {
+                var presupuesto = _presupuestoRepository.GetPresupuestoById(idPresupuesto);
+                ViewBag.Productos = new ProductoRepository().ListarProductos();
+                return View(presupuesto);
+            }
+
+            return RedirectToAction("Index");
+
+            // return (!agregado)? View(): RedirectToAction("Index");
         }
     }
 }

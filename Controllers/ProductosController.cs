@@ -3,8 +3,8 @@
     using Microsoft.AspNetCore.Mvc;
 
     namespace DistribuidoraInsumosMVC.Controllers
-    {  
-        
+    {
+
         public class ProductosController : Controller
         {
             private ProductoRepository _productoRepository;

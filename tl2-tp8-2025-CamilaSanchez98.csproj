@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Data\Tienda_final.db">
+    <None Update="Data\Tienda_final.db"> <!-- se modifica la DB de Data xq esa ruta escribi aqui, sino se modificaria la de bin/...-->
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
