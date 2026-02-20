@@ -1,10 +1,11 @@
+using DistribuidoraInsumosMVC.Interfaces;
 using DistribuidoraInsumosMVC.Models;
 using Microsoft.Data.Sqlite;
 using System.Data;
 
 namespace DistribuidoraInsumosMVC.Repositories
 {
-    public class PresupuestoRepository
+    public class PresupuestoRepository : IPresupuestoRepository
     {
         private string cadenaConexion = "Data Source = Data/Tienda_final.db";
 
