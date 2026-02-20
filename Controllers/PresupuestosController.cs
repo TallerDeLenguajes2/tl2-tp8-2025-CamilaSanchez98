@@ -5,12 +5,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering; //para el SelectList
 
 namespace DistribuidoraInsumosMVC.Controllers
-{  
-    
+{
+
     public class PresupuestosController : Controller
     {
-        private PresupuestoRepository _presupuestoRepository;
-        private ProductoRepository _prodRepo;
+        private readonly PresupuestoRepository _presupuestoRepository;
+        private readonly ProductoRepository _prodRepo;
 
         public PresupuestosController()
         {
@@ -113,7 +113,7 @@ namespace DistribuidoraInsumosMVC.Controllers
                 ListaProductos = new SelectList(productos, "id", "descripcion")
             };
 
-            return View(vm);
+            return View(vm); //recuerda que el return View(vm) hace que la pagina se recargue con los datos del vm cargados en el form y se muestran  los errores de los <span>
         }
         [HttpPost]
         public IActionResult AddProduct(AgregarProductoViewModel vm)
@@ -121,7 +121,7 @@ namespace DistribuidoraInsumosMVC.Controllers
             if (!ModelState.IsValid)
             {
                 var productos = _prodRepo.ListarProductos() ?? new List<Producto>();
-                vm.ListaProductos = new SelectList(productos, "id", "descripcion");
+                vm.ListaProductos = new SelectList(productos, "id", "descripcion"); // id y descripcion Tiene que coincidir con las propiedades de la clase Producto.
                 return View(vm);
             }
 

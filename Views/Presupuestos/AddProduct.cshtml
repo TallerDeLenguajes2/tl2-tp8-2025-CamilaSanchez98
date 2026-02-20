@@ -5,7 +5,7 @@
 }
 
 <h2>Agregar Producto al Presupuesto Nro @Model.IdPresupuesto</h2>
-
+@* LOS NAME DEL FORM DEBEN COINCIDIR CON LOS CAMPOS DE MI VIEWMODEL QUE ENVIO EN EL POST, EJ: Cantidad,IdProducto *@
 <div class="row">
     <div class="col-md-6">
         <form asp-action="AddProduct" method="post">
@@ -31,6 +31,8 @@
 <div class="mt-3">
     <a asp-action="Details" asp-route-id="@Model.IdPresupuesto">Volver al Presupuesto</a>
 </div>
+
+@* cjto de librerias de  js que me validan los datos con las reglas del servidor(mis Controllers)*@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

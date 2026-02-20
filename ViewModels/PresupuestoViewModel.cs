@@ -4,7 +4,7 @@ namespace DistribuidoraInsumosMVC.ViewModels
 {
     public class PresupuestoViewModel
     {
-        public int IdPresupuesto;
+        public int IdPresupuesto {get;set;}
 
         [Display(Name = "Nombre o correo electinico del destinatario")]
         [Required(ErrorMessage = "El nombre del destinatario es obligatorio.")]

@@ -5,11 +5,10 @@
 
 
     namespace DistribuidoraInsumosMVC.Controllers
-    {  
-        
+    {
         public class ProductosController : Controller
         {
-            private ProductoRepository _productoRepository;
+            private readonly ProductoRepository _productoRepository;
 
             public ProductosController()
             {
@@ -68,10 +67,9 @@
                 return View(productoVM);
             }
             [HttpPost]
-            public IActionResult Update(int idProducto, ProductoViewModel productoVM)
+            public IActionResult Update(ProductoViewModel productoVM)
             {
                 if(!ModelState.IsValid) return View(productoVM);
-                if(idProducto != productoVM.IdProducto) return NotFound();
 
                 var productoAeditar = new Producto
                 {
@@ -80,8 +78,8 @@
                     precio = (int)productoVM.Precio
                 };
 
-                bool actualizado = _productoRepository.ActualziarProducto(idProducto, productoAeditar);
-                return (!actualizado)? View(productoAeditar): RedirectToAction(nameof(Index));
+                bool actualizado = _productoRepository.ActualziarProducto(productoAeditar.id, productoAeditar);
+                return (!actualizado)? View(productoVM): RedirectToAction(nameof(Index));
             }
 
             //ELIMINACION
@@ -95,7 +93,7 @@
             public IActionResult DeleteConfirmed(int idProducto)
             {
                 bool eliminado =_productoRepository.EliminarProducto(idProducto);
-                return (!eliminado)? View():RedirectToAction("Index");
+                return (!eliminado)? View(_productoRepository.GetProductoById(idProducto)):RedirectToAction("Index");
             }
         }
     }

@@ -30,7 +30,7 @@ namespace DistribuidoraInsumosMVC.Repositories
 
             //obtengo el ultimo ID generado de presupuesto (xq se cargó..)
             // long idPresupuestoUltimo = command.LastInsertRowId; NO COMPATIBLE CON MI VERSION
-            
+
             int idPresupuestoLast = (int)(long)new SqliteCommand("SELECT last_insert_rowid()", connection).ExecuteScalar();
 
             // Insertar los detalles
@@ -115,7 +115,7 @@ namespace DistribuidoraInsumosMVC.Repositories
             {
                 var idProducto = Convert.ToInt32(readerDetalle["idProducto"]);
                 var cantidad = Convert.ToInt32(readerDetalle["Cantidad"]);
-                
+
                 var producto = productoRepo.GetProductoById(idProducto);
 
                 presupuesto.detalle.Add(new PresupuestoDetalle
@@ -138,7 +138,7 @@ namespace DistribuidoraInsumosMVC.Repositories
             if (presupuesto == null) return false;
 
             string query = @"INSERT INTO PresupuestosDetalle (idPresupuesto,idProducto,Cantidad) VALUES (@idPres,@idProd,@cantidad) ON CONFLICT(idPresupuesto, idProducto) DO UPDATE SET Cantidad = Cantidad + @cantidad;"; 
-            
+
             using var command = new SqliteCommand(query, connection);
             command.Parameters.Add(new SqliteParameter("@idProd",detalle.producto.id));
             command.Parameters.Add(new SqliteParameter("@idPres",idPresupuesto));
